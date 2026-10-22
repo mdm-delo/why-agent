@@ -38,6 +38,11 @@ def score_option(opt, rules):
     return s, why, blocked
 
 def similar_past(q, k=1):
+    o = providers.hmem('recall', q)
+    if o is not None:
+        return [{'id': m['content'].split(' ')[0], 'memory_id': m['id'], 'question': m['content'].split(' Q: ')[-1].split(' -> ')[0],
+                 'action': m['content'].split(' -> ')[-1], 'similarity': m['relevance'], 'engine': 'meterless/hmem', 'audit': providers.hmem('audit', m['id']).get('history')}
+                for m in o.get('memories', [])[:k] if m['relevance'] >= 0.3]
     if not os.path.exists(MEM): return []
     t = toks(q); best = []
     for line in open(MEM, encoding='utf-8'):
@@ -90,10 +95,12 @@ def decide(question, options, use_llm=False, remember=True):
                     'reviewers': votes,
                     'would_refute': [f"if '{e['fact'][:60]}' is no longer true ({e['source']})" for e in ev[:3]],
                     'past_similar': similar_past(question)},
-            'layers': dict(providers.status(), evidence_used=EVID_SRC),
+            'layers': dict(providers.status(), evidence_used=EVID_SRC, memory='meterless/hmem' if providers.hmem_ok() else 'local-jsonl'),
             'human_in_loop': 'Agent never executes money moves, signatures or messages as the founder; it returns a card for Yes/No/Later.'}
     if use_llm: card['why']['narration'] = llm_note(question, card)
     if remember:
+        hm = providers.hmem('remember', f"{card['id']} Q: {question} -> {action}")
+        card['memory'] = {'engine': 'meterless/hmem', 'id': hm['id']} if hm else {'engine': 'local-jsonl'}
         open(MEM, 'a', encoding='utf-8').write(json.dumps({'id': card['id'], 'question': question, 'action': action, 'confidence': conf}, ensure_ascii=False) + '\n')
     return card
 
@@ -104,7 +111,7 @@ def render(c):
     L += ['ALTERNATIVES:'] + [f"  {a['score']:+.0f} {a['option']}" + (f"  BLOCKED by {a['blocked_by']}" if a['blocked_by'] else '') + ''.join(f"\n      {t['rule']} {t['effect']} {t['because']}" for t in a['trace']) for a in w['alternatives']]
     L += ['REVIEWERS:'] + [f"  {v['agent']}: {v['vote']} - {v['reason']}" for v in w['reviewers']]
     L += ['WOULD REFUTE:'] + ['  ' + x for x in w['would_refute']]
-    if w['past_similar']: L += [f"PAST: {p['id']} '{p['question']}' -> {p['action']} (sim {p['similarity']})" for p in w['past_similar']]
+    if w['past_similar']: L += [f"PAST: {p['id']} '{p['question']}' -> {p['action']} (sim {p['similarity']}, {p.get('engine','jsonl')} {p.get('memory_id','')})" for p in w['past_similar']]
     if w.get('narration'): L += ['NARRATION (LLM): ' + w['narration']]
     return '\n'.join(L)
 

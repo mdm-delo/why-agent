@@ -12,16 +12,16 @@ button{background:#ff3bd4;border:0;color:#fff;padding:9px 16px;border-radius:6px
 <button onclick="go()">Decide &amp; explain</button><div id="out"></div>
 <script>
 const $=id=>document.getElementById(id),e=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-fetch('/api/scenarios').then(r=>r.json()).then(a=>a.forEach(s=>{const b=document.createElement('button');b.textContent=s.question.slice(0,42)+'…';b.onclick=()=>{$('q').value=s.question;$('o').value=s.options.join('\n')};$('sc').appendChild(b)}));
-async function go(){const r=await fetch('/api/decide',{method:'POST',body:JSON.stringify({question:$('q').value,options:$('o').value.split('\n'),llm:$('llm').checked})});const c=await r.json();if(c.error){$('out').innerHTML=e(c.error);return}
+fetch('/api/scenarios').then(r=>r.json()).then(a=>{const n=new URLSearchParams(location.search).get('s');if(n!==null){$('q').value=a[n].question;$('o').value=a[n].options.join('\n');$('llm').checked=location.search.includes('llm');go()}return a}).then(a=>a.forEach(s=>{const b=document.createElement('button');b.textContent=s.question.slice(0,42)+'…';b.onclick=()=>{$('q').value=s.question;$('o').value=s.options.join('\n')};$('sc').appendChild(b)}));
+async function go(){$('out').innerHTML='<p class=small>deciding…</p>';const r=await fetch('/api/decide',{method:'POST',body:JSON.stringify({question:$('q').value,options:$('o').value.split('\n'),llm:$('llm').checked})});const c=await r.json();if(c.error){$('out').innerHTML=e(c.error);return}
 const w=c.why;$('out').innerHTML=`<div class="card"><div class="small">${c.id} · ${e(c.status)} · quorum ${c.quorum}</div><div class="act">${e(c.action)}</div>
-<div class="small">confidence ${c.confidence}</div><div class="bar"><i style="width:${c.confidence*100}%"></i></div>
+<div class="small">confidence ${c.confidence} · evidence: ${c.layers.evidence_used} · memory: ${c.layers.memory} · llm: ${c.layers.llm}</div><div class="bar"><i style="width:${c.confidence*100}%"></i></div>
 <div class="sec"><h3>Rules applied</h3>${w.rules_applied.map(r=>`<div><b>${r.id} ${e(r.name)}</b> — ${e(r.text)} <span class="small">(matched: ${e(r.matched_on.join(', '))})</span></div>`).join('')||'none → low confidence'}</div>
 <div class="sec"><h3>Evidence</h3>${w.evidence.map(x=>`<div>${x.id} ${e(x.fact)} <span class="small">[${e(x.source)}, ${x.date}]</span></div>`).join('')}</div>
 <div class="sec"><h3>Alternatives considered</h3>${w.alternatives.map(a=>`<div class="${a.blocked_by?'blk':''}">${a.score>=0?'+':''}${a.score} ${e(a.option)} ${a.blocked_by?'· BLOCKED by '+a.blocked_by:''}<div class="small">${a.trace.map(t=>t.rule+' '+t.effect+' '+e(t.because)).join(' · ')}</div></div>`).join('')}</div>
 <div class="sec"><h3>Reviewers (2/3 quorum, silence = no)</h3>${w.reviewers.map(v=>`<div>${v.agent}: <b>${v.vote}</b> — ${e(v.reason)}</div>`).join('')}</div>
 <div class="sec"><h3>What would refute this</h3>${w.would_refute.map(x=>`<div class="small">${e(x)}</div>`).join('')}</div>
-${w.past_similar.length?`<div class="sec"><h3>Decided before</h3>${w.past_similar.map(p=>`<div>${p.id}: ${e(p.question)} → ${e(p.action)} (sim ${p.similarity})</div>`).join('')}</div>`:''}
+${w.past_similar.length?`<div class="sec"><h3>Decided before</h3>${w.past_similar.map(p=>`<div>${p.id}: ${e(p.question)} → ${e(p.action)} (sim ${p.similarity}) <span class=small>· Meterless H-MEM ${p.memory_id||''}, ledger: ${(p.audit||[]).map(a=>a.action).join('→')}</span></div>`).join('')}</div>`:''}
 ${w.narration?`<div class="sec"><h3>Narration (LLM, non-authoritative)</h3>${e(w.narration)}</div>`:''}
 <div class="sec"><button>Yes</button><button>No</button><button>Later</button></div></div>`}
 </script></body></html>

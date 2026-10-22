@@ -6,3 +6,8 @@ data/receipts.jsonl
 NEEDS.md
 SUBMISSION_DRAFT.md
 data/rules_ru.json
+hmem/node_modules/
+hmem/vendor/
+hmem/.notebook/
+hmem/.whyagent/
+media/frames/

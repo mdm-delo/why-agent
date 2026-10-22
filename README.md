@@ -24,10 +24,24 @@ GROQ_API_KEY=... python3 agent.py --demo --llm # optional narration via the Groq
 python3 test_agent.py
 ```
 
-## Sponsor layers (with honest fallbacks, see `providers.py`)
-- **Zetaris** is the evidence layer. With `ZETARIS_REST_URL`, `ZETARIS_API_KEY` and `ZETARIS_ORG_ID` set, the agent pulls evidence from the governed view `why_agent.evidence` (`data/zetaris_seed.sql`). Otherwise it uses `data/evidence.json`. Every card states which layer was used.
-- **Meterless Nightshift** is the LLM layer. It uses the local OpenAI-compatible runtime (`meterless/auto`, with the `meterless-app: why-agent` header) and falls back to the Groq free tier.
-- **Metering:** every evidence or LLM call writes a receipt (provider, latency, tokens) to `data/receipts.jsonl`.
+The Meterless H-MEM memory needs Node 20 one time: `cd hmem && npm install && npm run setup`. Without it, memory falls back to `data/memory.jsonl`.
+
+## Sponsor tech
+| Sponsor | Where it is used | Status |
+|---|---|---|
+| **Meterless H-MEM engine** | Decision memory (`hmem/bridge.ts`, called from `providers.hmem()`). Each card is stored with `remember`. New questions `recall` precedents through H-MEM hybrid retrieval. The card's "Decided before" section shows the H-MEM memory id and its **trust-ledger audit** (create → read). | **Working**, zero keys, runs locally. Proof: `agent.py --demo`, scenario 5 recalls `mem-4`; receipts are in `data/receipts.jsonl` (`provider: meterless/hmem`). |
+| Meterless Nightshift runtime | Optional LLM narration via `127.0.0.1:8088/v1`, model `meterless/auto` | Adapter ready. Nightshift is a desktop app (Windows/Mac/DGX); when it is not running, narration uses the Groq free tier. |
+| Zetaris | Evidence layer: REST query of the governed view `why_agent.evidence` (`data/zetaris_seed.sql`), env `ZETARIS_REST_URL`, `ZETARIS_API_KEY`, `ZETARIS_ORG_ID` | Adapter ready and the account is being registered. Until a token and Org ID are set, evidence comes from `data/evidence.json`. Every card states the layer it used. |
+
+Every evidence, memory or LLM call writes a receipt (provider, op, latency) to `data/receipts.jsonl`.
+
+## AI coding tools used
+- Grok Bot agent: code, tests, docs, slides and demo video.
+- Cursor: optional, not required to run.
+
+## Media
+- Slides: `docs/slides.html`, `docs/slides.pdf`
+- Demo video (102 s, captions, no voice): `media/why-agent-demo.mp4`
 
 ## Files
 - `agent.py` — rule matching, evidence retrieval, option scoring, reviewers and quorum, confidence, memory
@@ -39,4 +53,4 @@ python3 test_agent.py
 The rule set P1–P12 and the facts in the evidence file come from the team's earlier notes. All code in this folder was written during the hackathon window, from 22.10.2026 on.
 
 ## Roadmap
-Zetaris data harness as the evidence layer, Meterless Nightshift model races as extra reviewers, and a Telegram bridge for Yes/No/Later.
+Live Zetaris evidence, H-MEM sleep-cycle consolidation of old decisions, H-MEM feedback from Yes/No answers, Nightshift model races as extra reviewers, and a Telegram bridge for Yes/No/Later.

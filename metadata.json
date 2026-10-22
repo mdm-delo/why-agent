@@ -1,0 +1,45 @@
+{
+  "name": "Why-Agent",
+  "tagline": "A decision avatar that explains why: rules, evidence, alternatives, reviewer quorum, confidence, precedents.",
+  "hackathon": "Open Agent Hackathon 2026",
+  "track": "02 - The Agent That Can Explain Why",
+  "team": "MENfigiTAL",
+  "members": [
+    "Maksim Dovedyuk-Morozov"
+  ],
+  "repo": "https://github.com/mdm-delo/why-agent",
+  "license": "MIT",
+  "languages": [
+    "Python",
+    "TypeScript"
+  ],
+  "sponsor_tech": {
+    "meterless": {
+      "engines": [
+        "H-MEM"
+      ],
+      "used_for": "decision memory, precedent recall with provenance, trust-ledger audit",
+      "files": [
+        "hmem/bridge.ts",
+        "providers.py"
+      ]
+    },
+    "meterless_nightshift": {
+      "used_for": "optional LLM narration",
+      "status": "adapter, Groq fallback"
+    },
+    "zetaris": {
+      "used_for": "evidence layer",
+      "status": "adapter, local JSON fallback"
+    }
+  },
+  "ai_tools": [
+    "Grok Bot agent",
+    "Cursor (optional)"
+  ],
+  "demo": {
+    "video": "media/why-agent-demo.mp4",
+    "slides": "docs/slides.pdf",
+    "run": "python3 server.py 8765"
+  }
+}

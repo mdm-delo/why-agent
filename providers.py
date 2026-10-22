@@ -71,3 +71,16 @@ def status():
     z = all(os.environ.get(k) for k in ('ZETARIS_REST_URL', 'ZETARIS_API_KEY', 'ZETARIS_ORG_ID'))
     return {'evidence': 'zetaris' if z else 'local-json (Zetaris not configured)',
             'llm': 'meterless' if tok else ('groq' if os.environ.get('GROQ_API_KEY') else 'none'), 'meterless_base': base}
+
+# ---------- decision memory: Meterless H-MEM engine (hmem/bridge.ts), fallback JSONL
+import subprocess
+HM = os.path.join(HERE, 'hmem')
+def hmem_ok(): return os.path.isdir(os.path.join(HM, 'vendor', 'hmem')) and os.path.isdir(os.path.join(HM, 'node_modules'))
+def hmem(cmd, arg):
+    if not hmem_ok() or os.environ.get('WHY_NO_HMEM'): return None
+    t0 = time.time()
+    try:
+        p = subprocess.run([os.path.join(HM, 'node_modules', '.bin', 'tsx'), 'bridge.ts', cmd, arg], cwd=HM, capture_output=True, text=True, timeout=60)
+        o = json.loads(p.stdout); receipt('memory', 'meterless/hmem', t0, op=cmd); return o
+    except Exception as e:
+        receipt('memory', 'meterless/hmem', t0, op=cmd, error=type(e).__name__); return None
