@@ -11,3 +11,4 @@ hmem/vendor/
 hmem/.notebook/
 hmem/.whyagent/
 media/frames/
+data/switch_decisions.jsonl

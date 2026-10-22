@@ -1,0 +1,17 @@
+# Switch Console template: Why-Agent as a decision teammate in a Telegram group.
+agents:
+  - name: "{team}-why-agent"
+    description: Decides with a transparent why-trace; humans approve YES / NO / LATER
+    addressing: anyone
+    provider: "{provider}"
+    instructions: |
+      When addressed with "decide: question | option A | option B", run
+      `python3 switch/connector.py` logic and post the decision card. Never sign, pay or
+      message on anyone's behalf. Record the human verdict. Silence means NO.
+room:
+  name: "{team}-decisions"
+  bridge: "{bridge}"
+  agents: ["{team}-why-agent"]
+  users: ["{$creator}"]
+  kickoff: |
+    @{team}-why-agent this is the team decision room. Try: decide: Pay for GPU now? | Pay now | Use free tier
