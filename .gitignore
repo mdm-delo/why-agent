@@ -1,0 +1,8 @@
+__pycache__/
+data/memory.jsonl
+data/receipts.jsonl
+.env
+*.env
+NEEDS.md
+SUBMISSION_DRAFT.md
+data/rules_ru.json

@@ -1,0 +1,27 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Why-Agent · decision avatar that explains why</title>
+<style>body{font:15px system-ui;background:#0d0f14;color:#e8e8ee;max-width:960px;margin:24px auto;padding:0 16px}
+h1{color:#ffd27a}textarea,input{width:100%;background:#171a22;color:#eee;border:1px solid #333;border-radius:6px;padding:8px;box-sizing:border-box}
+button{background:#ff3bd4;border:0;color:#fff;padding:9px 16px;border-radius:6px;cursor:pointer;margin:6px 6px 0 0}
+.card{background:#171a22;border-radius:10px;padding:16px;margin-top:16px}.act{font-size:20px;color:#39ff88}.blk{color:#ff3b5c}
+.sec{margin-top:12px}.sec h3{margin:4px 0;color:#3df2ff;font-size:14px;text-transform:uppercase}.small{color:#999;font-size:13px}
+.bar{height:8px;background:#333;border-radius:4px}.bar i{display:block;height:8px;background:#39ff88;border-radius:4px}</style></head>
+<body><h1>Why-Agent</h1><p class="small">Decision avatar: every action comes with the rules, evidence, alternatives, reviewer votes and confidence behind it. The agent never executes money moves; it returns a card for the human's Yes / No / Later.</p>
+<div id="sc"></div>
+<p>Question</p><input id="q"><p>Options (one per line)</p><textarea id="o" rows="4"></textarea>
+<label class="small"><input type="checkbox" id="llm" style="width:auto"> add LLM narration (optional, free tier)</label><br>
+<button onclick="go()">Decide &amp; explain</button><div id="out"></div>
+<script>
+const $=id=>document.getElementById(id),e=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+fetch('/api/scenarios').then(r=>r.json()).then(a=>a.forEach(s=>{const b=document.createElement('button');b.textContent=s.question.slice(0,42)+'…';b.onclick=()=>{$('q').value=s.question;$('o').value=s.options.join('\n')};$('sc').appendChild(b)}));
+async function go(){const r=await fetch('/api/decide',{method:'POST',body:JSON.stringify({question:$('q').value,options:$('o').value.split('\n'),llm:$('llm').checked})});const c=await r.json();if(c.error){$('out').innerHTML=e(c.error);return}
+const w=c.why;$('out').innerHTML=`<div class="card"><div class="small">${c.id} · ${e(c.status)} · quorum ${c.quorum}</div><div class="act">${e(c.action)}</div>
+<div class="small">confidence ${c.confidence}</div><div class="bar"><i style="width:${c.confidence*100}%"></i></div>
+<div class="sec"><h3>Rules applied</h3>${w.rules_applied.map(r=>`<div><b>${r.id} ${e(r.name)}</b> — ${e(r.text)} <span class="small">(matched: ${e(r.matched_on.join(', '))})</span></div>`).join('')||'none → low confidence'}</div>
+<div class="sec"><h3>Evidence</h3>${w.evidence.map(x=>`<div>${x.id} ${e(x.fact)} <span class="small">[${e(x.source)}, ${x.date}]</span></div>`).join('')}</div>
+<div class="sec"><h3>Alternatives considered</h3>${w.alternatives.map(a=>`<div class="${a.blocked_by?'blk':''}">${a.score>=0?'+':''}${a.score} ${e(a.option)} ${a.blocked_by?'· BLOCKED by '+a.blocked_by:''}<div class="small">${a.trace.map(t=>t.rule+' '+t.effect+' '+e(t.because)).join(' · ')}</div></div>`).join('')}</div>
+<div class="sec"><h3>Reviewers (2/3 quorum, silence = no)</h3>${w.reviewers.map(v=>`<div>${v.agent}: <b>${v.vote}</b> — ${e(v.reason)}</div>`).join('')}</div>
+<div class="sec"><h3>What would refute this</h3>${w.would_refute.map(x=>`<div class="small">${e(x)}</div>`).join('')}</div>
+${w.past_similar.length?`<div class="sec"><h3>Decided before</h3>${w.past_similar.map(p=>`<div>${p.id}: ${e(p.question)} → ${e(p.action)} (sim ${p.similarity})</div>`).join('')}</div>`:''}
+${w.narration?`<div class="sec"><h3>Narration (LLM, non-authoritative)</h3>${e(w.narration)}</div>`:''}
+<div class="sec"><button>Yes</button><button>No</button><button>Later</button></div></div>`}
+</script></body></html>

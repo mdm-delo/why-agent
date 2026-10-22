@@ -1,0 +1,107 @@
+[
+ {
+  "id": "E1",
+  "fact": "Example: treasury is near zero, monthly AI expense is small and income is $0 (illustrative figures).",
+  "source": "example ledger",
+  "date": "2026-10-18",
+  "tags": [
+   "money",
+   "cost",
+   "income",
+   "credits",
+   "paid",
+   "api",
+   "risk"
+  ]
+ },
+ {
+  "id": "E2",
+  "fact": "OAH 2026 track 02 prizes: $1,600 / $1,200 / $900; entry is free.",
+  "source": "delo/hackathon/oah_plan.md",
+  "date": "2026-10-15",
+  "tags": [
+   "hackathon",
+   "prize",
+   "opportunity",
+   "grant"
+  ]
+ },
+ {
+  "id": "E3",
+  "fact": "Prize payout is by bank transfer within 30 days; a legal receiving channel is still open.",
+  "source": "delo/hackathon/oah_plan.md",
+  "date": "2026-10-09",
+  "tags": [
+   "prize",
+   "payment",
+   "hackathon",
+   "risk"
+  ]
+ },
+ {
+  "id": "E4",
+  "fact": "Free LLM tiers (Groq, DeepSeek) and a local 3B model already run the agents' loop.",
+  "source": "dashboard/sources/models_chain.json",
+  "date": "2026-10-18",
+  "tags": [
+   "api",
+   "service",
+   "credits",
+   "paid",
+   "free",
+   "subscription"
+  ]
+ },
+ {
+  "id": "E5",
+  "fact": "OpenAI and x.ai keys exist but have zero credits.",
+  "source": "ops log 2026-10-22",
+  "date": "2026-10-22",
+  "tags": [
+   "api",
+   "credits",
+   "paid",
+   "subscription",
+   "cost"
+  ]
+ },
+ {
+  "id": "E6",
+  "fact": "Paper simulation 'Gratitude' direction: +$13/mo optimistic, -$76/mo conservative.",
+  "source": "queen2 loop round 1",
+  "date": "2026-10-22",
+  "tags": [
+   "income",
+   "revenue",
+   "risk",
+   "goal"
+  ]
+ },
+ {
+  "id": "E7",
+  "fact": "Past decision: first trading bot ran on paper only until a proven edge (rule P2).",
+  "source": "avatar/decision_avatar.md",
+  "date": "2026-10-18",
+  "tags": [
+   "trade",
+   "risk",
+   "bet",
+   "invest",
+   "double"
+  ]
+ },
+ {
+  "id": "E8",
+  "fact": "Founder's wallet transactions are signed only in Tonkeeper by the founder.",
+  "source": "avatar/decision_avatar.md P7",
+  "date": "2026-10-18",
+  "tags": [
+   "wallet",
+   "sign",
+   "transaction",
+   "transfer",
+   "payment",
+   "pay"
+  ]
+ }
+]

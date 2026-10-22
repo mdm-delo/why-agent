@@ -1,0 +1,7 @@
+[
+{"question":"Should we spend on paid API credits for OpenAI to speed up the agents?","options":["Top up and pay $20 for OpenAI credits now","Stay on free Groq and local model; pay only when it pays off","Buy an unbounded subscription"]},
+{"question":"The paper trading bot could double the treasury but may lose half. What do we do?","options":["Go all-in with the full treasury","Small share with a stop-loss after more paper testing","Skip it"]},
+{"question":"A sponsor asks us to sign a wallet transaction to claim a hackathon reward. Should the agent sign?","options":["Agent signs the transaction and sends funds itself","Prepare the transaction draft and ask the founder to sign in Tonkeeper","Ignore the request"]},
+{"question":"Should we apply to the hackathon prize opportunity this week?","options":["Apply with an honest, transparent demo; prize feeds the main goal","Skip as a distraction","Apply and exaggerate traction numbers"]},
+{"question":"Should we apply to another hackathon prize opportunity?","options":["Apply with an honest demo","Skip as a distraction"]}
+]
