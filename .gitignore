@@ -11,3 +11,6 @@ hmem/vendor/
 hmem/.notebook/
 hmem/.whyagent/
 media/frames/
+data/ryo_practice.jsonl
+.env
+__pycache__/
